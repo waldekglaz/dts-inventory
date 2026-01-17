@@ -2,6 +2,7 @@
 
 import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function addProduct(formData: FormData) {
     const name = formData.get('name') as string;
@@ -19,6 +20,7 @@ export async function addRecipeItem(productId: number, materialId: number, yield
     VALUES (?, ?, ?)
   `).run(productId, materialId, yieldPerUnit);
     revalidatePath('/products');
+    revalidatePath(`/products/${productId}`);
 }
 
 export async function addProductAccessory(productId: number, accessoryId: number, qty: number) {
@@ -27,6 +29,7 @@ export async function addProductAccessory(productId: number, accessoryId: number
     VALUES (?, ?, ?)
   `).run(productId, accessoryId, qty);
     revalidatePath('/products');
+    revalidatePath(`/products/${productId}`);
 }
 
 export async function deleteProduct(formData: FormData) {
@@ -43,4 +46,5 @@ export async function deleteProduct(formData: FormData) {
     deleteTx();
 
     revalidatePath('/products');
+    redirect('/products');
 }
