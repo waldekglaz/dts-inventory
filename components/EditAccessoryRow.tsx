@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Edit2, X, Save, Trash2 } from 'lucide-react';
 import { updateAccessory, deleteAccessory } from '@/app/accessories/actions';
+import ConfirmDeleteButton from './ConfirmDeleteButton';
 
 export default function EditAccessoryRow({ acc }: { acc: any }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -29,12 +30,12 @@ export default function EditAccessoryRow({ acc }: { acc: any }) {
                     >
                         <Edit2 size={14} />
                     </button>
-                    <form action={deleteAccessory} style={{ display: 'inline' }}>
-                        <input type="hidden" name="id" value={acc.id} />
-                        <button type="submit" className="btn btn-outline" style={{ padding: '0.4rem', fontSize: '0.75rem', borderColor: 'var(--danger-dim)', color: 'var(--danger)' }}>
-                            <Trash2 size={14} />
-                        </button>
-                    </form>
+                    <ConfirmDeleteButton
+                        action={deleteAccessory}
+                        id={acc.id}
+                        itemName={acc.name}
+                        buttonStyle={{ borderColor: 'var(--danger-dim)', color: 'var(--danger)' }}
+                    />
                 </td>
             </tr>
         );

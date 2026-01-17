@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Edit2, X, Save, Trash2 } from 'lucide-react';
 import { updateMaterial, deleteMaterial } from '@/app/materials/actions';
+import ConfirmDeleteButton from './ConfirmDeleteButton';
 
 export default function EditMaterialRow({ m }: { m: any }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -30,12 +31,12 @@ export default function EditMaterialRow({ m }: { m: any }) {
                     >
                         <Edit2 size={14} />
                     </button>
-                    <form action={deleteMaterial} style={{ display: 'inline' }}>
-                        <input type="hidden" name="id" value={m.id} />
-                        <button type="submit" className="btn btn-outline" style={{ padding: '0.4rem', fontSize: '0.75rem', borderColor: 'var(--danger-dim)', color: 'var(--danger)' }} title="Delete Material">
-                            <Trash2 size={14} />
-                        </button>
-                    </form>
+                    <ConfirmDeleteButton
+                        action={deleteMaterial}
+                        id={m.id}
+                        itemName={m.name}
+                        buttonStyle={{ borderColor: 'var(--danger-dim)', color: 'var(--danger)' }}
+                    />
                 </td>
             </tr>
         );

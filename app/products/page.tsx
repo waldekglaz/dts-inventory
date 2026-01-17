@@ -3,6 +3,7 @@ import NewProductForm from '@/components/NewProductForm';
 import RecipeEditor from '@/components/RecipeEditor';
 import AccessoryEditor from '@/components/AccessoryEditor';
 import SearchBar from '@/components/SearchBar';
+import ConfirmDeleteButton from '@/components/ConfirmDeleteButton';
 import { Box, Trash2 } from 'lucide-react';
 import { deleteProduct } from './actions';
 
@@ -65,12 +66,14 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                         <div key={product.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                 <h3 style={{ marginBottom: 0 }}>{product.name}</h3>
-                                <form action={deleteProduct}>
-                                    <input type="hidden" name="id" value={product.id} />
-                                    <button type="submit" style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
-                                        <Trash2 size={18} />
-                                    </button>
-                                </form>
+                                <ConfirmDeleteButton
+                                    action={deleteProduct}
+                                    id={product.id}
+                                    itemName={product.name}
+                                    buttonClass=""
+                                    buttonStyle={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                    iconSize={18}
+                                />
                             </div>
 
                             <div style={{ flex: 1 }}>

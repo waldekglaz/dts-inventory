@@ -1,5 +1,6 @@
 import db from '@/lib/db';
 import NewOrderForm from '@/components/NewOrderForm';
+import ConfirmDeleteButton from '@/components/ConfirmDeleteButton';
 import { ShoppingCart, Clock, Trash2 } from 'lucide-react';
 import { deleteOrder } from './actions';
 
@@ -56,12 +57,12 @@ export default function OrdersPage() {
                                         <td style={{ fontSize: '0.85rem' }}>{new Date(o.created_at).toLocaleDateString()}</td>
                                         <td><span className="badge badge-success">{o.status}</span></td>
                                         <td>
-                                            <form action={deleteOrder}>
-                                                <input type="hidden" name="id" value={o.id} />
-                                                <button type="submit" className="btn btn-outline" style={{ padding: '0.4rem', color: 'var(--danger)' }}>
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </form>
+                                            <ConfirmDeleteButton
+                                                action={deleteOrder}
+                                                id={o.id}
+                                                itemName={`Order #${o.id} for ${o.customer_name}`}
+                                                buttonStyle={{ padding: '0.4rem', color: 'var(--danger)' }}
+                                            />
                                         </td>
                                     </tr>
                                 ))}
