@@ -11,5 +11,7 @@ export async function updateCurrency(formData: FormData) {
         revalidatePath('/materials');
         revalidatePath('/products');
         revalidatePath('/settings');
+        return { success: true };
     }
+    return { success: false };
 }

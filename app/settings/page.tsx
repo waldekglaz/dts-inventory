@@ -2,6 +2,7 @@ import { Settings as SettingsIcon, Database, Terminal, ShieldCheck, Banknote } f
 import path from 'path';
 import { getSetting } from '@/lib/db';
 import { updateCurrency } from './actions';
+import CurrencySettingsForm from '@/components/CurrencySettingsForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,26 +29,7 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
-                    <form action={updateCurrency} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Primary Currency</label>
-                            <select
-                                name="currency"
-                                key={currentCurrency}
-                                defaultValue={currentCurrency}
-                                style={{ width: '100%', background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }}
-                            >
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                                <option value="GBP">GBP (£)</option>
-                                <option value="PLN">PLN (zł)</option>
-                                <option value="JPY">JPY (¥)</option>
-                            </select>
-                        </div>
-                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
-                            Save Changes
-                        </button>
-                    </form>
+                    <CurrencySettingsForm currentCurrency={currentCurrency} />
                 </div>
 
                 <div className="card">
