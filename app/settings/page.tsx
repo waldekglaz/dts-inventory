@@ -1,8 +1,11 @@
-import { Settings as SettingsIcon, Database, Terminal, ShieldCheck } from 'lucide-react';
+import { Settings as SettingsIcon, Database, Terminal, ShieldCheck, Banknote } from 'lucide-react';
 import path from 'path';
+import { getSetting } from '@/lib/db';
+import { updateCurrency } from './actions';
 
 export default function SettingsPage() {
     const dbPath = path.join(process.cwd(), 'inventory.db');
+    const currentCurrency = getSetting('currency') || 'USD';
 
     return (
         <div>
@@ -12,6 +15,38 @@ export default function SettingsPage() {
             </header>
 
             <div style={{ display: 'grid', gap: '2rem' }}>
+                <div className="card">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <div style={{ padding: '0.75rem', background: 'var(--primary-dim)', color: 'var(--primary)', borderRadius: '12px' }}>
+                            <Banknote size={24} />
+                        </div>
+                        <div>
+                            <h3 style={{ marginBottom: 0 }}>Internationalization</h3>
+                            <p style={{ fontSize: '0.85rem' }}>Adjust currency and units for your region.</p>
+                        </div>
+                    </div>
+
+                    <form action={updateCurrency} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ flex: 1 }}>
+                            <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Primary Currency</label>
+                            <select
+                                name="currency"
+                                defaultValue={currentCurrency}
+                                style={{ width: '100%', background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }}
+                            >
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                                <option value="PLN">PLN (zł)</option>
+                                <option value="JPY">JPY (¥)</option>
+                            </select>
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+
                 <div className="card">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                         <div style={{ padding: '0.75rem', background: 'var(--primary-dim)', color: 'var(--primary)', borderRadius: '12px' }}>

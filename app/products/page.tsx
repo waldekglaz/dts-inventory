@@ -6,11 +6,13 @@ import SearchBar from '@/components/SearchBar';
 import ConfirmDeleteButton from '@/components/ConfirmDeleteButton';
 import { Box, Trash2 } from 'lucide-react';
 import { deleteProduct } from './actions';
+import { getCurrencySymbol } from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ProductsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
     const query = (await searchParams).q || '';
+    const currencySymbol = getCurrencySymbol();
 
     const products = query
         ? db.prepare('SELECT * FROM products WHERE name LIKE ? ORDER BY name ASC').all(`%${query}%`) as any[]
@@ -26,7 +28,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     <h1>Production Catalog</h1>
                     <p>Define products, their bill of materials, and packaging requirements.</p>
                 </div>
-                <NewProductForm />
+                <NewProductForm currencySymbol={currencySymbol} />
             </header>
 
             <SearchBar placeholder="Search products by name..." />
@@ -87,7 +89,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                                 {product.price > 0 && (
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Unit Price:</span>
-                                        <span>${product.price.toFixed(2)}</span>
+                                        <span>{currencySymbol}{product.price.toFixed(2)}</span>
                                     </div>
                                 )}
                             </div>

@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 
 declare global {
-    var db: Database.Database | undefined;
+  var db: Database.Database | undefined;
 }
 
 // Use a singleton pattern to avoid multiple connections in dev mode
@@ -13,18 +13,18 @@ let db: Database.Database;
 const dbPath = path.join(process.cwd(), 'inventory.db');
 
 if (!global.db) {
-    db = new Database(dbPath);
-    // Enable WAL mode for better concurrency and performance
-    db.pragma('journal_mode = WAL');
-    // ENFORCE FOREIGN KEYS (Crucial for SQLite)
-    db.pragma('foreign_keys = ON');
-    global.db = db;
+  db = new Database(dbPath);
+  // Enable WAL mode for better concurrency and performance
+  db.pragma('journal_mode = WAL');
+  // ENFORCE FOREIGN KEYS (Crucial for SQLite)
+  db.pragma('foreign_keys = ON');
+  global.db = db;
 } else {
-    db = global.db;
+  db = global.db;
 }
 
 export function initDb() {
-    const setup = `
+  const setup = `
     CREATE TABLE IF NOT EXISTS materials (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -81,8 +81,25 @@ export function initDb() {
       FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
       FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+
+    -- Seed default currency if not exists
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('currency', 'USD');
   `;
-    db.exec(setup);
+  db.exec(setup);
+}
+
+export function getSetting(key: string): string {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  return row?.value || '';
+}
+
+export function setSetting(key: string, value: string) {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
 }
 
 // Initialize tables on first import/load

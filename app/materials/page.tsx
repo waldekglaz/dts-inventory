@@ -3,11 +3,13 @@ import NewMaterialForm from '@/components/NewMaterialForm';
 import EditMaterialRow from '@/components/EditMaterialRow';
 import SearchBar from '@/components/SearchBar';
 import { Package } from 'lucide-react';
+import { getCurrencySymbol } from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MaterialsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
     const query = (await searchParams).q || '';
+    const currencySymbol = getCurrencySymbol();
 
     const materials = query
         ? db.prepare('SELECT * FROM materials WHERE name LIKE ? ORDER BY name ASC').all(`%${query}%`) as any[]
@@ -20,7 +22,7 @@ export default async function MaterialsPage({ searchParams }: { searchParams: Pr
                     <h1>Material Inventory</h1>
                     <p>Manage your raw materials and stock levels.</p>
                 </div>
-                <NewMaterialForm />
+                <NewMaterialForm currencySymbol={currencySymbol} />
             </header>
 
             <SearchBar placeholder="Search materials by name..." />
@@ -46,7 +48,7 @@ export default async function MaterialsPage({ searchParams }: { searchParams: Pr
                             </thead>
                             <tbody>
                                 {materials.map((m) => (
-                                    <EditMaterialRow key={m.id} m={m} />
+                                    <EditMaterialRow key={m.id} m={m} currencySymbol={currencySymbol} />
                                 ))}
                             </tbody>
                         </table>

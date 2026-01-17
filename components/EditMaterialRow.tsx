@@ -5,7 +5,7 @@ import { Edit2, X, Save, Trash2 } from 'lucide-react';
 import { updateMaterial, deleteMaterial } from '@/app/materials/actions';
 import ConfirmDeleteButton from './ConfirmDeleteButton';
 
-export default function EditMaterialRow({ m }: { m: any }) {
+export default function EditMaterialRow({ m, currencySymbol = '$' }: { m: any, currencySymbol?: string }) {
     const [isEditing, setIsEditing] = useState(false);
 
     if (!isEditing) {
@@ -15,7 +15,7 @@ export default function EditMaterialRow({ m }: { m: any }) {
                 <td style={{ fontWeight: 500 }}>{m.name}</td>
                 <td>{m.quantity} <span style={{ color: 'var(--text-muted)', fontSize: '0.85em' }}>{m.unit}</span></td>
                 <td>{m.min_level} <span style={{ color: 'var(--text-muted)', fontSize: '0.85em' }}>{m.unit}</span></td>
-                <td>{m.cost_per_unit ? `$${m.cost_per_unit.toFixed(2)}` : '-'}</td>
+                <td>{m.cost_per_unit ? `${currencySymbol}${m.cost_per_unit.toFixed(2)}` : '-'}</td>
                 <td>
                     {isLow ? (
                         <span className="badge badge-danger">Low Stock</span>

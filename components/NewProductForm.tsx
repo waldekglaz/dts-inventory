@@ -4,7 +4,7 @@ import { addProduct } from '@/app/products/actions';
 import { useState, useRef } from 'react';
 import { Plus, X, Box } from 'lucide-react';
 
-export default function NewProductForm() {
+export default function NewProductForm({ currencySymbol = '$' }: { currencySymbol?: string }) {
     const [isOpen, setIsOpen] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -38,7 +38,7 @@ export default function NewProductForm() {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Selling Price (Optional)</label>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Selling Price ({currencySymbol})</label>
                         <input name="price" type="number" step="0.01" placeholder="0.00"
                             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
                     </div>
