@@ -48,3 +48,27 @@ export async function deleteProduct(formData: FormData) {
     revalidatePath('/products');
     redirect('/products');
 }
+
+export async function deleteRecipeItem(formData: FormData) {
+    const id = formData.get('id') as string;
+    const recipeItem = db.prepare('SELECT product_id FROM recipes WHERE id = ?').get(id) as { product_id: number };
+
+    db.prepare('DELETE FROM recipes WHERE id = ?').run(id);
+
+    if (recipeItem) {
+        revalidatePath(`/products/${recipeItem.product_id}`);
+    }
+    revalidatePath('/products');
+}
+
+export async function deleteProductAccessory(formData: FormData) {
+    const id = formData.get('id') as string;
+    const item = db.prepare('SELECT product_id FROM product_accessories WHERE id = ?').get(id) as { product_id: number };
+
+    db.prepare('DELETE FROM product_accessories WHERE id = ?').run(id);
+
+    if (item) {
+        revalidatePath(`/products/${item.product_id}`);
+    }
+    revalidatePath('/products');
+}

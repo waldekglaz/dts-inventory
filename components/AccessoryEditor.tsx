@@ -1,8 +1,9 @@
 'use client'
 
-import { addProductAccessory } from '@/app/products/actions';
+import { addProductAccessory, deleteProductAccessory } from '@/app/products/actions';
 import { Plus, Package } from 'lucide-react';
 import { useState } from 'react';
+import ConfirmDeleteButton from './ConfirmDeleteButton';
 
 export default function AccessoryEditor({ productId, accessories, currentAccessories }: { productId: number, accessories: any[], currentAccessories: any[] }) {
     const [selectedAccessory, setSelectedAccessory] = useState('');
@@ -21,9 +22,17 @@ export default function AccessoryEditor({ productId, accessories, currentAccesso
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                 {currentAccessories.map((item) => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', background: 'var(--bg-element)', padding: '0.5rem', borderRadius: '4px' }}>
-                        <span>{item.accessory_name}</span>
-                        <span style={{ color: 'var(--warning)', fontWeight: 600 }}>{item.quantity_per_product} {item.unit} / unit</span>
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', background: 'var(--bg-element)', padding: '0.5rem', borderRadius: '4px' }}>
+                        <div>
+                            <span>{item.accessory_name}</span>
+                            <span style={{ color: 'var(--warning)', fontWeight: 600, marginLeft: '0.5rem' }}>{item.quantity_per_product} {item.unit} / unit</span>
+                        </div>
+                        <ConfirmDeleteButton
+                            action={deleteProductAccessory}
+                            id={item.id}
+                            buttonStyle={{ padding: '0.2rem', color: 'var(--text-muted)', border: 'none', background: 'transparent' }}
+                            iconSize={14}
+                        />
                     </div>
                 ))}
             </div>

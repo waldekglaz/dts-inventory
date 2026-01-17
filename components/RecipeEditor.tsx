@@ -1,8 +1,9 @@
 'use client'
 
-import { addRecipeItem } from '@/app/products/actions';
+import { addRecipeItem, deleteRecipeItem } from '@/app/products/actions';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import ConfirmDeleteButton from './ConfirmDeleteButton';
 
 export default function RecipeEditor({ productId, materials, currentRecipe }: { productId: number, materials: any[], currentRecipe: any[] }) {
     const [selectedMaterial, setSelectedMaterial] = useState('');
@@ -21,9 +22,17 @@ export default function RecipeEditor({ productId, materials, currentRecipe }: { 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                 {currentRecipe.map((item) => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', background: 'var(--bg-element)', padding: '0.5rem', borderRadius: '4px' }}>
-                        <span>{item.material_name}</span>
-                        <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{item.yield_per_unit} items / {item.unit}</span>
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', background: 'var(--bg-element)', padding: '0.5rem', borderRadius: '4px' }}>
+                        <div>
+                            <span>{item.material_name}</span>
+                            <span style={{ color: 'var(--primary)', fontWeight: 600, marginLeft: '0.5rem' }}>{item.yield_per_unit} items / {item.unit}</span>
+                        </div>
+                        <ConfirmDeleteButton
+                            action={deleteRecipeItem}
+                            id={item.id}
+                            buttonStyle={{ padding: '0.2rem', color: 'var(--text-muted)', border: 'none', background: 'transparent' }}
+                            iconSize={14}
+                        />
                     </div>
                 ))}
             </div>

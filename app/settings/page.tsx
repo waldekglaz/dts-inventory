@@ -3,6 +3,8 @@ import path from 'path';
 import { getSetting } from '@/lib/db';
 import { updateCurrency } from './actions';
 
+export const dynamic = 'force-dynamic';
+
 export default function SettingsPage() {
     const dbPath = path.join(process.cwd(), 'inventory.db');
     const currentCurrency = getSetting('currency') || 'USD';
@@ -31,6 +33,7 @@ export default function SettingsPage() {
                             <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Primary Currency</label>
                             <select
                                 name="currency"
+                                key={currentCurrency}
                                 defaultValue={currentCurrency}
                                 style={{ width: '100%', background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }}
                             >
