@@ -38,8 +38,14 @@ export default function NewMaterialForm({ currencySymbol = '$' }: { currencySymb
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Quantity</label>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>In House Qty</label>
                         <input name="quantity" type="number" step="0.01" required placeholder="0.00"
+                            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Remote Qty</label>
+                        <input name="quantity_remote" type="number" step="0.01" placeholder="0.00"
                             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
                     </div>
 
@@ -55,7 +61,7 @@ export default function NewMaterialForm({ currencySymbol = '$' }: { currencySymb
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Min Level (Alert)</label>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Min Level (Total)</label>
                         <input name="min_level" type="number" step="0.01" required placeholder="10.00"
                             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
                     </div>
@@ -63,6 +69,14 @@ export default function NewMaterialForm({ currencySymbol = '$' }: { currencySymb
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Cost Per Unit ({currencySymbol})</label>
                         <input name="cost_per_unit" type="number" step="0.01" placeholder="0.00"
+                            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
+                    </div>
+
+
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Time (Days)</label>
+                        <input name="lead_time_days" type="number" min="0" placeholder="0"
                             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
                     </div>
                 </div>

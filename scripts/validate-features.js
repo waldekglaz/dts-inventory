@@ -46,7 +46,15 @@ try {
     assert(hasCompletionDate, 'Column "completion_date" exists in orders');
     assert(hasCustomerId, 'Column "customer_id" exists in orders');
 
-    // 4. Integration Test: Create Customer and Link Product
+    // 5. Check Material Columns
+    const matInfo = db.prepare("PRAGMA table_info(materials)").all();
+    const hasRemoteQty = matInfo.some(c => c.name === 'quantity_remote');
+    const hasLeadTime = matInfo.some(c => c.name === 'lead_time_days');
+
+    assert(hasRemoteQty, 'Column "quantity_remote" exists in materials');
+    assert(hasLeadTime, 'Column "lead_time_days" exists in materials');
+
+    // 6. Integration Test: Create Customer and Link Product
     const testCustomerName = `Test Customer ${Date.now()}`;
     const insertCust = db.prepare("INSERT INTO customers (name) VALUES (?)").run(testCustomerName);
     const custId = insertCust.lastInsertRowid;

@@ -12,12 +12,12 @@ export default function Home() {
   const stats = {
     materials: (db.prepare('SELECT COUNT(*) as count FROM materials').get() as any).count,
     accessories: (db.prepare('SELECT COUNT(*) as count FROM accessories').get() as any).count,
-    lowStock: (db.prepare('SELECT COUNT(*) as count FROM materials WHERE quantity <= min_level').get() as any).count +
+    lowStock: (db.prepare('SELECT COUNT(*) as count FROM materials WHERE (quantity + quantity_remote) <= min_level').get() as any).count +
       (db.prepare('SELECT COUNT(*) as count FROM accessories WHERE quantity <= min_level').get() as any).count,
     activeOrders: (db.prepare('SELECT COUNT(*) as count FROM orders WHERE status = ?').get('pending') as any).count,
   };
 
-  const lowStockMats = db.prepare("SELECT id, name, quantity, min_level, unit, 'Material' as type FROM materials WHERE quantity <= min_level").all() as any[];
+  const lowStockMats = db.prepare("SELECT id, name, (quantity + quantity_remote) as quantity, min_level, unit, lead_time_days, 'Material' as type FROM materials WHERE (quantity + quantity_remote) <= min_level").all() as any[];
   const lowStockAccs = db.prepare("SELECT id, name, quantity, min_level, unit, 'Accessory' as type FROM accessories WHERE quantity <= min_level").all() as any[];
   const lowStockItems = [...lowStockMats, ...lowStockAccs].sort((a, b) => (a.quantity / a.min_level) - (b.quantity / b.min_level)).slice(0, 10);
 
@@ -131,7 +131,15 @@ export default function Home() {
                 <tbody>
                   {lowStockItems.map((item, idx) => (
                     <tr key={`${item.type}-${item.id}-${idx}`}>
-                      <td style={{ fontWeight: 500 }}>{item.name}</td>
+                      <td style={{ fontWeight: 500 }}>
+                        {item.name}
+                        {item.type === 'Material' && item.lead_time_days > 0 && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--warning)' }}></span>
+                            {item.lead_time_days} day lead time
+                          </div>
+                        )}
+                      </td>
                       <td>
                         <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', background: 'var(--bg-element)', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                           {item.type}
@@ -143,7 +151,18 @@ export default function Home() {
                           <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>/ {item.min_level} {item.unit}</span>
                         </div>
                       </td>
-                      <td><span className="badge badge-danger">Reorder</span></td>
+                      <td>
+                        {item.type === 'Material' && item.lead_time_days > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <span className="badge badge-danger">Order Now</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                              Arrives: {new Date(Date.now() + item.lead_time_days * 86400000).toLocaleDateString([], { month: 'numeric', day: 'numeric' })}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="badge badge-danger">Reorder</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

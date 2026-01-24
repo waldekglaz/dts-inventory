@@ -38,10 +38,12 @@ export function initDb() {
     CREATE TABLE IF NOT EXISTS materials (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      quantity REAL NOT NULL DEFAULT 0 CHECK (quantity >= 0),
+      quantity REAL NOT NULL DEFAULT 0 CHECK (quantity >= 0), -- Now treated as In House
+      quantity_remote REAL NOT NULL DEFAULT 0 CHECK (quantity_remote >= 0),
       unit TEXT NOT NULL DEFAULT 'units',
       min_level REAL NOT NULL DEFAULT 0,
-      cost_per_unit REAL DEFAULT 0
+      cost_per_unit REAL DEFAULT 0,
+      lead_time_days INTEGER DEFAULT 0 -- Days needed to receive material
     );
 
     CREATE TABLE IF NOT EXISTS accessories (
@@ -130,6 +132,17 @@ export function initDb() {
 
   try {
     db.prepare("ALTER TABLE orders ADD COLUMN completion_date DATETIME").run();
+  } catch (error) { /* Column likely exists */ }
+
+  // Material migrations
+  try {
+    // We are effectively abandoning 'location' in favor of split quantities, 
+    // but we won't delete it to preserve data just in case.
+    db.prepare("ALTER TABLE materials ADD COLUMN quantity_remote REAL NOT NULL DEFAULT 0").run();
+  } catch (error) { /* Column likely exists */ }
+
+  try {
+    db.prepare("ALTER TABLE materials ADD COLUMN lead_time_days INTEGER DEFAULT 0").run();
   } catch (error) { /* Column likely exists */ }
 }
 
