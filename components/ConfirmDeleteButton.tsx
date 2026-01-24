@@ -3,7 +3,7 @@
 import { Trash2 } from 'lucide-react';
 
 interface ConfirmDeleteButtonProps {
-    action: (formData: FormData) => void | Promise<void>;
+    action: (formData: FormData) => any;
     id: number | string;
     itemName?: string;
     buttonClass?: string;

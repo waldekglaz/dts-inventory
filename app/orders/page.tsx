@@ -16,6 +16,17 @@ export default function OrdersPage() {
   `).all() as any[];
 
     const products = db.prepare('SELECT id, name FROM products').all() as any[];
+    const customers = db.prepare('SELECT id, name FROM customers ORDER BY name ASC').all() as any[];
+
+    // Build map of customerId -> productIds
+    const customerProducts = db.prepare('SELECT customer_id, product_id FROM customer_products').all() as { customer_id: number; product_id: number }[];
+    const customerProductMap: Record<number, number[]> = {};
+    for (const cp of customerProducts) {
+        if (!customerProductMap[cp.customer_id]) {
+            customerProductMap[cp.customer_id] = [];
+        }
+        customerProductMap[cp.customer_id].push(cp.product_id);
+    }
 
     return (
         <div>
@@ -24,7 +35,7 @@ export default function OrdersPage() {
                     <h1>Order History</h1>
                     <p>Track production fulfillment and customer requests.</p>
                 </div>
-                <NewOrderForm products={products} />
+                <NewOrderForm products={products} customers={customers} customerProductMap={customerProductMap} />
             </header>
 
             <div className="card">
@@ -38,11 +49,13 @@ export default function OrdersPage() {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
+                                    <th>Order #</th>
                                     <th>Customer</th>
                                     <th>Product</th>
                                     <th>Qty</th>
-                                    <th>Date</th>
+                                    <th>Ordered</th>
+                                    <th>Start</th>
+                                    <th>Finish</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -54,7 +67,9 @@ export default function OrdersPage() {
                                         <td style={{ fontWeight: 600 }}>{o.customer_name}</td>
                                         <td>{o.product_name}</td>
                                         <td>{o.quantity}</td>
-                                        <td style={{ fontSize: '0.85rem' }}>{new Date(o.created_at).toLocaleDateString()}</td>
+                                        <td style={{ fontSize: '0.85rem' }}>{o.order_date ? new Date(o.order_date).toLocaleDateString() : '-'}</td>
+                                        <td style={{ fontSize: '0.85rem' }}>{o.start_date ? new Date(o.start_date).toLocaleDateString() : '-'}</td>
+                                        <td style={{ fontSize: '0.85rem' }}>{o.completion_date ? new Date(o.completion_date).toLocaleDateString() : '-'}</td>
                                         <td><span className="badge badge-success">{o.status}</span></td>
                                         <td>
                                             <ConfirmDeleteButton

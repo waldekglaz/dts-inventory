@@ -25,6 +25,16 @@ if (!global.db) {
 
 export function initDb() {
   const setup = `
+    CREATE TABLE IF NOT EXISTS customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT,
+      phone TEXT,
+      address TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS materials (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -68,9 +78,14 @@ export function initDb() {
 
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customer_name TEXT NOT NULL,
+      customer_name TEXT NOT NULL, -- Keeping for backward compatibility or quick orders
+      customer_id INTEGER,
       status TEXT DEFAULT 'pending',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      start_date DATETIME,
+      completion_date DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE SET NULL
     );
 
     CREATE TABLE IF NOT EXISTS order_items (
@@ -87,10 +102,35 @@ export function initDb() {
       value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS customer_products (
+      customer_id INTEGER,
+      product_id INTEGER,
+      PRIMARY KEY (customer_id, product_id),
+      FOREIGN KEY(customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+      FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE
+    );
+
     -- Seed default currency if not exists
     INSERT OR IGNORE INTO settings (key, value) VALUES ('currency', 'USD');
   `;
   db.exec(setup);
+
+  // Migrations for existing tables
+  try {
+    db.prepare("ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL").run();
+  } catch (error) { /* Column likely exists */ }
+
+  try {
+    db.prepare("ALTER TABLE orders ADD COLUMN order_date DATETIME DEFAULT CURRENT_TIMESTAMP").run();
+  } catch (error) { /* Column likely exists */ }
+
+  try {
+    db.prepare("ALTER TABLE orders ADD COLUMN start_date DATETIME").run();
+  } catch (error) { /* Column likely exists */ }
+
+  try {
+    db.prepare("ALTER TABLE orders ADD COLUMN completion_date DATETIME").run();
+  } catch (error) { /* Column likely exists */ }
 }
 
 export function getSetting(key: string): string {

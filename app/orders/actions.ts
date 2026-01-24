@@ -4,11 +4,20 @@ import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
 export async function createOrder(formData: FormData) {
-    const customerName = formData.get('customerName') as string;
+    const customerId = formData.get('customerId') as string;
     const productId = parseInt(formData.get('productId') as string);
     const quantity = parseInt(formData.get('quantity') as string);
 
-    if (!customerName || !productId || !quantity) return { error: 'Missing fields' };
+    // Dates
+    const orderDate = formData.get('orderDate') as string;
+    const startDate = formData.get('startDate') as string;
+    const completionDate = formData.get('completionDate') as string;
+
+    if (!customerId || !productId || !quantity) return { error: 'Missing required fields' };
+
+    // Get customer name for cache/display if needed (though we rely on ID now)
+    const customer = db.prepare('SELECT name FROM customers WHERE id = ?').get(customerId) as { name: string };
+    const customerName = customer ? customer.name : 'Unknown';
 
     // Get requirements
     const recipe = db.prepare('SELECT material_id, yield_per_unit FROM recipes WHERE product_id = ?').all(productId) as any[];
@@ -18,27 +27,54 @@ export async function createOrder(formData: FormData) {
         return { error: 'Product has no materials or accessories defined' };
     }
 
-    // Pre-check stock levels
+    const missingReport: any[] = [];
+
+    // Check material stock
     for (const item of recipe) {
         if (item.yield_per_unit <= 0) continue;
         const needed = quantity / item.yield_per_unit;
         const mat = db.prepare('SELECT name, quantity, unit FROM materials WHERE id = ?').get(item.material_id) as any;
+
         if (!mat || mat.quantity < needed) {
-            return { error: `Insufficient material stock: "${mat.name}". Required: ${needed.toFixed(2)}, Available: ${mat.quantity.toFixed(2)}` };
+            missingReport.push({
+                type: 'Material',
+                name: mat ? mat.name : 'Unknown Material',
+                required: needed,
+                available: mat ? mat.quantity : 0,
+                missing: needed - (mat ? mat.quantity : 0),
+                unit: mat ? mat.unit : 'units'
+            });
         }
     }
 
+    // Check accessory stock
     for (const item of prodAccessories) {
         const needed = quantity * item.quantity_per_product;
         const acc = db.prepare('SELECT name, quantity, unit FROM accessories WHERE id = ?').get(item.accessory_id) as any;
+
         if (!acc || acc.quantity < needed) {
-            return { error: `Insufficient accessory stock: "${acc.name}". Required: ${needed}, Available: ${acc.quantity}` };
+            missingReport.push({
+                type: 'Accessory',
+                name: acc ? acc.name : 'Unknown Accessory',
+                required: needed,
+                available: acc ? acc.quantity : 0,
+                missing: needed - (acc ? acc.quantity : 0),
+                unit: acc ? acc.unit : 'pcs'
+            });
         }
+    }
+
+    if (missingReport.length > 0) {
+        return { report: missingReport };
     }
 
     // Use a transaction
     const orderTx = db.transaction(() => {
-        const orderResult = db.prepare('INSERT INTO orders (customer_name, status) VALUES (?, ?)').run(customerName, 'completed');
+        const orderResult = db.prepare(`
+            INSERT INTO orders (customer_id, customer_name, status, order_date, start_date, completion_date) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).run(customerId, customerName, 'completed', orderDate, startDate, completionDate);
+
         const orderId = orderResult.lastInsertRowid;
         db.prepare('INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)').run(orderId, productId, quantity);
 
@@ -60,12 +96,10 @@ export async function createOrder(formData: FormData) {
         orderTx();
         revalidatePath('/orders');
         revalidatePath('/materials');
+        revalidatePath('/accessories');
         revalidatePath('/');
         return { success: true };
     } catch (err: any) {
-        if (err.message.includes('CHECK constraint failed: quantity >= 0')) {
-            return { error: 'Insufficient stock: One or more materials would fall below zero.' };
-        }
         return { error: 'System Error: ' + err.message };
     }
 }

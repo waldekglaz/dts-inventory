@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Package, Box, ShoppingCart, Settings, Layers } from 'lucide-react';
+import { Home, Package, Box, ShoppingCart, Settings, Layers, Users } from 'lucide-react';
 
 export default function Sidebar() {
     const pathname = usePathname();
 
     const links = [
         { href: '/', label: 'Overview', icon: Home },
+        { href: '/customers', label: 'Customers', icon: Users },
         { href: '/materials', label: 'Materials', icon: Package },
         { href: '/accessories', label: 'Accessories', icon: Layers },
         { href: '/products', label: 'Products', icon: Box },
