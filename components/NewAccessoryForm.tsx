@@ -54,6 +54,12 @@ export default function NewAccessoryForm() {
                         <input name="min_level" type="number" step="0.01" required defaultValue="5"
                             style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
                     </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Lead Time (Days)</label>
+                        <input name="lead_time_days" type="number" min="0" defaultValue="0"
+                            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-subtle)', padding: '0.6rem', borderRadius: '6px', color: 'white' }} />
+                    </div>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>

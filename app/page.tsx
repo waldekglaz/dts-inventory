@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   const lowStockMats = db.prepare("SELECT id, name, (quantity + quantity_remote) as quantity, min_level, unit, lead_time_days, 'Material' as type FROM materials WHERE (quantity + quantity_remote) <= min_level").all() as any[];
-  const lowStockAccs = db.prepare("SELECT id, name, quantity, min_level, unit, 'Accessory' as type FROM accessories WHERE quantity <= min_level").all() as any[];
+  const lowStockAccs = db.prepare("SELECT id, name, quantity, min_level, unit, lead_time_days, 'Accessory' as type FROM accessories WHERE quantity <= min_level").all() as any[];
   const lowStockItems = [...lowStockMats, ...lowStockAccs].sort((a, b) => (a.quantity / a.min_level) - (b.quantity / b.min_level)).slice(0, 10);
 
   const recentOrders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC LIMIT 5').all() as any[];
@@ -133,7 +133,7 @@ export default function Home() {
                     <tr key={`${item.type}-${item.id}-${idx}`}>
                       <td style={{ fontWeight: 500 }}>
                         {item.name}
-                        {item.type === 'Material' && item.lead_time_days > 0 && (
+                        {item.lead_time_days > 0 && (
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--warning)' }}></span>
                             {item.lead_time_days} day lead time
@@ -152,7 +152,7 @@ export default function Home() {
                         </div>
                       </td>
                       <td>
-                        {item.type === 'Material' && item.lead_time_days > 0 ? (
+                        {item.lead_time_days > 0 ? (
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                             <span className="badge badge-danger">Order Now</span>
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>

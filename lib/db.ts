@@ -51,7 +51,8 @@ export function initDb() {
       name TEXT NOT NULL,
       quantity REAL NOT NULL DEFAULT 0 CHECK (quantity >= 0),
       unit TEXT NOT NULL DEFAULT 'pcs',
-      min_level REAL NOT NULL DEFAULT 0
+      min_level REAL NOT NULL DEFAULT 0,
+      lead_time_days INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS products (
@@ -143,6 +144,11 @@ export function initDb() {
 
   try {
     db.prepare("ALTER TABLE materials ADD COLUMN lead_time_days INTEGER DEFAULT 0").run();
+  } catch (error) { /* Column likely exists */ }
+
+  // Accessory migrations
+  try {
+    db.prepare("ALTER TABLE accessories ADD COLUMN lead_time_days INTEGER DEFAULT 0").run();
   } catch (error) { /* Column likely exists */ }
 }
 
